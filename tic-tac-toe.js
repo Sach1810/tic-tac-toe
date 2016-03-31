@@ -7,25 +7,31 @@
 // p.name
 // // Mary
 //
-var Player = undefined; /* TODO replace undefined with class definition */
+var Player = function(name){
+  this.name = name;
+} /* TODO replace undefined with class definition ***DONE*** */
 
 // TicTacToe class is the main class of the game. The constructor should take
 // two arguments, the two names of the players.
-var TicTacToe = function (/* TODO fill in arguments */) {
-  this.player1 = new Player(/* TODO */);
-  this.player2 = new Player(/* TODO */);
-
+var TicTacToe = function (player1 ,player2) {
+  this.player1 = new Player(player1);
+  this.player2 = new Player(player2);
   this.reset();
+  
 };
 
 // TODO
 // Reset the game with a new board and player 1 as the current player.
 TicTacToe.prototype.reset = function () {
+  this.currentPlayer = this.player1;
+  this.board = new Board();
+  this.print();
 }
 
 // Now, verify that you can create an instance of TicTacToe:
 //
-// game = new TicTacToe("John", "Mary");
+//game = new TicTacToe("John", "Mary");
+
 // game.player1.name
 // // John
 // game.player2.name
@@ -49,6 +55,8 @@ TicTacToe.prototype.reset = function () {
 // TODO
 // Print the board and the current player's name.
 TicTacToe.prototype.print = function () {
+  this.board.print();
+  console.log("Its your turn "+ this.currentPlayer.name + "!");
 }
 
 // game = new TicTacToe("John", "Mary");
@@ -62,6 +70,12 @@ TicTacToe.prototype.print = function () {
 // TODO
 // Switch this.currentPlayer to the other player.
 TicTacToe.prototype.switchCurrentPlayer = function () {
+  if (this.currentPlayer === this.player1){
+    this.currentPlayer = this.player2;
+  } else {
+    this.currentPlayer = this.player1;
+  }
+
 }
 
 // game = new TicTacToe("John", "Mary");
@@ -83,6 +97,11 @@ TicTacToe.prototype.switchCurrentPlayer = function () {
 // TODO
 // Should return "X" if the current turn is player 1's. Return "O" otherwise.
 TicTacToe.prototype.currentChar = function () {
+  if (this.currentPlayer === this.player1){
+          return "X";
+  } else {
+          return "O";
+  }
 }
 
 // game = new TicTacToe("John", "Mary");
@@ -106,7 +125,38 @@ TicTacToe.prototype.currentChar = function () {
 //
 // If the game is now tied, print this out.
 //
+
+
+
 TicTacToe.prototype.play = function (position) {
+ if (this.board.winner()) {
+    console.log("Game is over.");
+    return;
+  }
+
+  plays = this.board.play(this.currentChar(), position);
+
+  this.switchCurrentPlayer();
+
+  var winner = this.board.winner();
+  if (winner == "X") {
+    console.log("Wow! " + this.player1.name + " has won!");
+  } else if (winner == "O") {
+    console.log("Brilliant! " + this.player2.name + " has won!");
+  } else if (winner == "tie") {
+    console.log("Tie. Why are we even playing this game?");
+  } else {   
+      if (plays == false){
+          this.switchCurrentPlayer();
+          this.print();
+
+      } else {
+        this.print();
+      }
+    
+  }
+
+}
 
   // TODO, using the functions you implemented above:
   // - Check if the game is over. Return if it is.
@@ -114,7 +164,8 @@ TicTacToe.prototype.play = function (position) {
   // - Check for a winner after position is played.
   // - Switch the current player to the next one.
   // - Print the state of the board and next person's turn.
-}
+
+
 
 // You should now be able to play the game. Congrats, you're done! (But you may
 // have some bugs in the edge-cases. Seek them out).
@@ -164,8 +215,12 @@ var Board = function () {
   this.board = [["1", "2", "3"],
                 ["4", "5", "6"],
                 ["7", "8", "9"]];
+
 }
 
+
+// game = new TicTacToe("John", "Mary");
+// game.print()
 // TODO
 // Prints the board state to the console. At the beginning, the board should
 // just show the positions:
@@ -189,6 +244,16 @@ var Board = function () {
 // As a harder challenge, write the board in HTML and use jQuery for user input.
 //
 Board.prototype.print = function () {
+  var lengthBoard = this.board.length;
+  var gridCombined = "";
+  for (var i = 0; i < lengthBoard; i++){
+          gridCombined += "\n";
+       for (var j = 0; j < lengthBoard; j++) {
+         var y = this.board[i][j];
+        gridCombined += y;
+       }
+  } 
+      console.log(gridCombined);
 };
 
 // TODO: This is the second-hardest function in this game. If you want to
@@ -200,26 +265,28 @@ Board.prototype.print = function () {
 Board.prototype.play = function (char, position) {
   if (char !== "X" && char != "O") {
     console.log("Invalid character. Try again.");
-    return;
+    return false;
   }
 
   if (position < 1 || position > 9) {
     console.log("Positions must be from 1 to 9. Try again.");
-    return;
+    return false;
   }
 
   var row = Math.floor((position - 1) / 3);
   var col = (position - 1) % 3;
 
   var currentChar = this.board[row][col];
+
   if (currentChar === "X" || currentChar === "O") {
     console.log("Position has already been played. Try again.");
-    return;
+    return false;
   }
 
   this.board[row][col] = char;
+  
 
-  return;
+  return true;
 };
 
 // TODO: This is the hardest function in this game. If you want to challenge
@@ -281,3 +348,4 @@ Board.prototype.winner = function () {
     return;
   }
 };
+var game = new TicTacToe("John","Mary");
